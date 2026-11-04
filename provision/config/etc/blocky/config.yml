@@ -1,0 +1,44 @@
+# Pocket filtering resolver. Listens on loopback only; nftables forces every DNS query here.
+# Docs: https://0xerr0r.github.io/blocky/latest/configuration/
+upstreams:
+  groups:
+    default:
+      - tcp-tls:dns.quad9.net
+      - tcp-tls:one.one.one.one
+  strategy: parallel_best
+  timeout: 3s
+bootstrapDns:
+  - upstream: tcp-tls:dns.quad9.net
+    ips: [9.9.9.9, 149.112.112.112]
+blocking:
+  denylists:
+    ads:
+      - https://big.oisd.nl/domainswild
+      - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.txt
+    custom:
+      - /etc/blocky/custom-deny.txt
+  allowlists:
+    ads:
+      - /etc/blocky/custom-allow.txt
+  clientGroupsBlock:
+    default: [ads, custom]
+  blockType: zeroIp
+  blockTTL: 1m
+  loading:
+    refreshPeriod: 24h
+    downloads:
+      timeout: 60s
+      attempts: 5
+    strategy: blocking   # hold queries until the lists are loaded (~3 s); "fast" leaks for a few seconds at boot
+caching:
+  minTime: 5m
+  maxTime: 30m
+  prefetching: true
+queryLog:
+  type: console
+  logRetentionDays: 0
+ports:
+  dns: 127.0.0.1:53
+  http: 127.0.0.1:4000
+log:
+  level: info

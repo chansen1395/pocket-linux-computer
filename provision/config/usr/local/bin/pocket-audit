@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Claude Code PostToolUse hook (Bash). Appends every command Claude ran to ~/.pocket/audit.log.
+set -u
+input="$(cat)"
+cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)"
+[ -n "$cmd" ] || exit 0
+mkdir -p "$HOME/.pocket"
+printf '%s\t%s\n' "$(date -Is)" "$(printf '%s' "$cmd" | tr '\n' ' ')" >> "$HOME/.pocket/audit.log"
+exit 0

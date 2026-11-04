@@ -1,0 +1,26 @@
+# secrets and local state
+.env
+**/.env
+secrets/
+*.key
+*.pem
+logs/
+# build outputs
+*.stl
+*.3mf
+*.gcode
+cad/out/
+# python
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+# editors
+.vscode/
+.idea/
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,11 @@
+[Unit]
+Description=Kiwix offline library (Pocket)
+After=local-fs.target
+
+[Service]
+User=@USER@
+ExecStart=/usr/bin/kiwix-serve --address 127.0.0.1 --port 8090 --library /data/kiwix/library.xml
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

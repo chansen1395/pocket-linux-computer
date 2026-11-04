@@ -1,0 +1,1 @@
+# domains that a blocklist breaks and we need anyway

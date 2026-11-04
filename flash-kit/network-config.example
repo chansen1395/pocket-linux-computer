@@ -1,0 +1,13 @@
+# Template for the first-boot "network-config" file (netplan v2, read by cloud-init).
+# Copy it to "network-config" in this folder and fill in your own network. The real file is ignored by
+# git because it holds your Wi-Fi password.
+network:
+  version: 2
+  wifis:
+    wlan0:
+      dhcp4: true
+      optional: true
+      regulatory-domain: "US"
+      access-points:
+        "CHANGE_ME_WIFI_NAME":
+          password: "CHANGE_ME_WIFI_PASSWORD"

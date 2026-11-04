@@ -1,0 +1,83 @@
+/* Pocket TUI: phosphor-green look. Colors come from the "phosphor" Theme in app.py; this is layout. */
+
+Screen {
+    background: $background;
+    color: $foreground;
+}
+Screen.narrow #stat-grid { grid-size: 2; }
+Screen.narrow #device-box { row-span: 2; }
+
+/* header */
+PocketHeader {
+    dock: top;
+    height: 1;
+    background: $panel;
+    color: $primary;
+}
+PocketHeader Static { width: auto; padding: 0 1; }
+#hd-host { text-style: bold; color: $warning; }
+#hd-clock { width: 1fr; text-align: center; }
+#hd-ai { color: $foreground 30%; }
+#hd-ai.active { color: $warning; text-style: bold; }
+#hd-ai.active.on { background: $warning; color: $background; }
+
+/* tabs */
+TabbedContent { height: 1fr; }
+TabbedContent > ContentSwitcher { height: 1fr; }
+TabPane { height: 1fr; padding: 0 1; }
+Tabs { background: $panel; }
+Tab { padding: 0 2; text-style: bold; color: $foreground 55%; }
+Tab.-active { color: $warning; }
+Underline > .underline--bar { color: $warning; background: $secondary 30%; }
+
+/* panels and controls */
+.box {
+    border: round $secondary;
+    border-title-color: $warning;
+    border-title-style: bold;
+    padding: 0 1;
+    height: auto;
+}
+.box.fill { height: 1fr; }
+.row { height: auto; }
+Button {
+    height: 3;
+    min-width: 10;
+    margin: 0 1 0 0;
+    border: none;
+    background: $panel;
+    color: $primary;
+    text-style: bold;
+}
+Button:hover, Button:focus { background: $secondary; color: $background; }
+Button.selected { background: $primary; color: $background; }
+Button.-warning { color: $warning; }
+Button.-error { color: $error; }
+Input { height: 3; border: tall $secondary; background: $surface; }
+Input:focus { border: tall $primary; }
+ListView { height: 1fr; background: $surface; }
+ListItem { padding: 0 1; background: $surface; }
+ListItem > Label { width: 1fr; }
+ListView > ListItem.-highlight { background: $secondary 45%; }
+ListView:focus > ListItem.-highlight { background: $secondary 70%; }
+Log { height: 1fr; background: $surface; }
+#media-status { padding: 0 0 0 1; color: $warning; }
+#bright-text { width: 1fr; height: 3; content-align: center middle; }
+
+/* grids */
+#stat-grid { layout: grid; grid-size: 3; grid-columns: 1fr; grid-rows: auto; grid-gutter: 0 1; height: auto; }
+#data-grid, #sys-grid { layout: grid; grid-size: 2; grid-gutter: 0 1; height: 1fr; }
+#data-grid { grid-columns: 3fr 2fr; }
+
+/* dialogs */
+ModalScreen { align: center middle; }
+.dialog {
+    width: 60;
+    max-width: 90%;
+    height: auto;
+    border: heavy $warning;
+    background: $surface;
+    padding: 1 2;
+}
+.dialog Label { width: 1fr; margin: 0 0 1 0; }
+.dialog Input { margin: 0 0 1 0; }

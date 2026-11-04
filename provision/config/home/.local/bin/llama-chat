@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# llama-chat             -> interactive chat with the local model (llama-cli)
+# llama-chat "question"  -> one-shot answer through a background llama-server, started on demand
+# Env: LLAMA_MODEL (gguf path), LLAMA_CTX (context, default 8192), LLAMA_PORT (default 9931)
+set -euo pipefail
+MODEL="${LLAMA_MODEL:-/data/models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf}"
+CTX="${LLAMA_CTX:-8192}"; PORT="${LLAMA_PORT:-9931}"
+# Four threads plus full memory bandwidth tripped the Pi 5's power chip on a 3 A charger (2026-10-16):
+# default to two threads unless the firmware negotiated a 5 A supply. LLAMA_THREADS overrides.
+supply_ma="$(od -An -tu4 --endian=big /proc/device-tree/chosen/power/max_current 2>/dev/null | tr -d ' ')"
+if [ -n "${LLAMA_THREADS:-}" ]; then THREADS="$LLAMA_THREADS"; elif [ "${supply_ma:-0}" -ge 5000 ]; then THREADS=4; else THREADS=2; fi
+[ -r "$MODEL" ] || { echo "no model at $MODEL (run provisioning stage 80)" >&2; exit 1; }
+if [ $# -eq 0 ]; then exec llama-cli -m "$MODEL" -c "$CTX" -t "$THREADS"; fi
+mkdir -p "$HOME/.pocket"
+if ! curl -sf "http://127.0.0.1:$PORT/health" >/dev/null; then
+  nohup llama-server -m "$MODEL" -c "$CTX" -t "$THREADS" --port "$PORT" >"$HOME/.pocket/llama-server.log" 2>&1 &
+  for _ in $(seq 1 60); do curl -sf "http://127.0.0.1:$PORT/health" >/dev/null && break; sleep 1; done
+fi
+jq -n --arg q "$*" '{messages:[{role:"system",content:"You are Pocket, an offline assistant on a small device. Be brief and practical."},{role:"user",content:$q}],max_tokens:400}' \
+  | curl -s "http://127.0.0.1:$PORT/v1/chat/completions" -H 'Content-Type: application/json' -d @- \
+  | jq -r '.choices[0].message.content'

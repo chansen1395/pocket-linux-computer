@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Nightly restic backup to a repository you configure in /etc/pocket/restic.env.
+# Skips quietly when unconfigured, and when an sftp repository's host is unreachable.
+set -euo pipefail
+[ -r /etc/pocket/restic.env ] || { echo "pocket-backup: no /etc/pocket/restic.env, skipping"; exit 0; }
+set -a; . /etc/pocket/restic.env; set +a
+[ -n "${RESTIC_REPOSITORY:-}" ] || { echo "pocket-backup: RESTIC_REPOSITORY is empty, skipping"; exit 0; }
+[ -n "${RESTIC_PASSWORD:-}${RESTIC_PASSWORD_FILE:-}" ] || { echo "pocket-backup: no restic password set, skipping"; exit 0; }
+case "$RESTIC_REPOSITORY" in
+  sftp:*) host="${RESTIC_REPOSITORY#sftp:}"; host="${host#*@}"; host="${host%%:*}" ;;
+  *) host="" ;;
+esac
+if [ -n "$host" ] && ! ping -c1 -W3 "$host" >/dev/null 2>&1; then echo "pocket-backup: $host unreachable, skipping"; exit 0; fi
+restic snapshots >/dev/null 2>&1 || restic init
+# shellcheck disable=SC2086
+restic backup $BACKUP_PATHS $BACKUP_EXCLUDES --tag pocket
+restic forget --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --prune

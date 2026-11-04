@@ -1,0 +1,2 @@
+# tiny manifest for container tests (a few MB)
+wikipedia   speedtest_en_blob-mini   # kiwix speed-test ZIM

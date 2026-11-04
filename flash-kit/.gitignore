@@ -1,0 +1,9 @@
+# Your first-boot settings hold a Wi-Fi password and keys. Never commit them.
+user-data
+network-config
+password*
+# The OS image and the flash log
+*.img
+*.img.xz
+*.sha256
+flash.log

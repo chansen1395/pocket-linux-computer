@@ -1,0 +1,9 @@
+[Unit]
+Description=Pocket restic backup
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/pocket-backup
+Nice=10
+IOSchedulingClass=idle

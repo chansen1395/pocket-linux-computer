@@ -1,0 +1,129 @@
+#!/usr/bin/python3 -I
+"""pocket-helper: the one program the device user may run as root, through sudo.
+
+Stages 50 and 55 install this file root-owned in /usr/local/bin and grant the user passwordless sudo for
+this path only. Every request is checked against an exact allow-list before anything is written or run.
+Nothing is passed to a shell, and no argument is ever used as a path: paths are built from constants plus
+a value that has matched a strict pattern.
+
+    pocket-helper set-governor policyN GOVERNOR     write a cpufreq governor
+    pocket-helper set-max-freq policyN KHZ          write a cpufreq maximum frequency
+    pocket-helper set-profile NAME                  record the power profile in /var/lib/pocket
+    pocket-helper snapshot NAME                     read-only btrfs snapshot of / in /.snapshots
+    pocket-helper snapshot-delete NAME              delete one of the Claude hook's snapshots
+
+Why a helper: a sudoers rule such as "tee /sys/.../policy*/scaling_governor" matches any text where the
+star is, including spaces and slashes, so it also allows "tee /etc/sudoers.d/x". A rule that names only
+this script, which validates its own arguments, does not.
+
+Exit status: 0 on success, 2 when the request is refused, otherwise the status of the command that failed.
+"""
+import os
+import re
+import subprocess
+import sys
+
+CPUFREQ_ROOT = "/sys/devices/system/cpu/cpufreq"
+STATE_DIR = "/var/lib/pocket"
+PROFILE_FILE = STATE_DIR + "/power-profile"
+SNAPSHOT_DIR = "/.snapshots"
+BTRFS = "/usr/bin/btrfs"
+
+PROFILES = ("performance", "balanced", "endurance")
+GOVERNORS = ("performance", "ondemand", "schedutil", "conservative", "powersave")
+POLICY_RE = re.compile(r"policy[0-9]{1,2}")
+FREQ_RE = re.compile(r"[0-9]{6,7}")
+FREQ_MIN_KHZ, FREQ_MAX_KHZ = 300_000, 4_000_000
+SNAPSHOT_RE = re.compile(r"[0-9]{8}-[0-9]{6}-[A-Za-z0-9._-]{1,40}")
+HOOK_SNAPSHOT_RE = re.compile(r"[0-9]{8}-[0-9]{6}-claude")
+
+
+class Refused(Exception):
+    """The request is not on the allow-list."""
+
+
+def _need(argv, count, usage):
+    if len(argv) != count:
+        raise Refused(f"usage: pocket-helper {usage}")
+
+
+def _match(pattern, value, what):
+    if not pattern.fullmatch(value):
+        raise Refused(f"refused: {what} is not allowed")
+    return value
+
+
+def plan(argv):
+    """Validate a request and return the steps to run: ("mkdir", dir), ("write", path, text), ("run", [argv])."""
+    if not argv:
+        raise Refused("usage: pocket-helper VERB ARGS (see the header of this file)")
+    verb, args = argv[0], argv[1:]
+    if verb == "set-governor":
+        _need(args, 2, "set-governor policyN GOVERNOR")
+        policy = _match(POLICY_RE, args[0], "policy")
+        if args[1] not in GOVERNORS:
+            raise Refused("refused: governor is not allowed")
+        return [("write", f"{CPUFREQ_ROOT}/{policy}/scaling_governor", args[1])]
+    if verb == "set-max-freq":
+        _need(args, 2, "set-max-freq policyN KHZ")
+        policy = _match(POLICY_RE, args[0], "policy")
+        khz = _match(FREQ_RE, args[1], "frequency")
+        if not FREQ_MIN_KHZ <= int(khz) <= FREQ_MAX_KHZ:
+            raise Refused("refused: frequency is out of range")
+        return [("write", f"{CPUFREQ_ROOT}/{policy}/scaling_max_freq", str(int(khz)))]
+    if verb == "set-profile":
+        _need(args, 1, "set-profile NAME")
+        if args[0] not in PROFILES:
+            raise Refused("refused: profile is not allowed")
+        return [("mkdir", STATE_DIR), ("write", PROFILE_FILE, args[0] + "\n")]
+    if verb == "snapshot":
+        _need(args, 1, "snapshot NAME")
+        name = _match(SNAPSHOT_RE, args[0], "snapshot name")
+        return [("run", [BTRFS, "subvolume", "snapshot", "-r", "/", f"{SNAPSHOT_DIR}/{name}"])]
+    if verb == "snapshot-delete":
+        _need(args, 1, "snapshot-delete NAME")
+        name = _match(HOOK_SNAPSHOT_RE, args[0], "snapshot name")
+        return [("run", [BTRFS, "subvolume", "delete", f"{SNAPSHOT_DIR}/{name}"])]
+    raise Refused("refused: unknown verb")
+
+
+def execute(steps):
+    status = 0
+    for step in steps:
+        if step[0] == "mkdir":
+            os.makedirs(step[1], mode=0o755, exist_ok=True)
+        elif step[0] == "write":
+            if os.path.islink(step[1]):
+                raise OSError(f"refusing to write through the symlink {step[1]}")
+            with open(step[1], "w", encoding="ascii") as handle:
+                handle.write(step[2])
+        else:
+            status = subprocess.run(step[1], check=False).returncode
+            if status:
+                return status
+    return status
+
+
+def is_root():
+    return os.geteuid() == 0
+
+
+def main(argv=None, run=execute):
+    argv = sys.argv[1:] if argv is None else argv
+    try:
+        steps = plan(argv)
+    except Refused as exc:
+        print(f"pocket-helper: {exc}", file=sys.stderr)
+        return 2
+    if not is_root():
+        print("pocket-helper: must run as root (through sudo)", file=sys.stderr)
+        return 2
+    try:
+        return run(steps)
+    except OSError as exc:
+        print(f"pocket-helper: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

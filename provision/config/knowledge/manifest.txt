@@ -1,0 +1,8 @@
+# folder  filename-prefix   (the stage resolves the newest dated file "<prefix>_YYYY-MM.zim" in that folder)
+# Names checked against download.kiwix.org on 2026-10-16. Start small; add the big ones on a fast link.
+wikipedia   wikipedia_en-simple_all_maxi   # ~300 MB, Simple English Wikipedia (note the hyphen)
+wikipedia   wikipedia_en_medicine_maxi     # ~2 GB, WikiMed: medical articles with pictures
+ifixit      ifixit_en_all                  # ~3 GB, repair guides
+# wikipedia wikipedia_en_all_nopic         # ~50 GB, English Wikipedia without pictures
+# wikipedia wikipedia_en_all_maxi          # ~110 GB, English Wikipedia with pictures
+# wikipedia wikipedia_en_all_mini          # ~15 GB, English Wikipedia, intros only

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# pocket-mode console|desktop|status : switch between the cage kiosk (console) and lightdm (desktop).
+set -euo pipefail
+case "${1:-status}" in
+  console)
+    systemctl stop lightdm.service || true
+    systemctl start pocket-console.service
+    ;;
+  desktop)
+    systemctl stop pocket-console.service || true
+    systemctl start lightdm.service
+    ;;
+  status)
+    for u in lightdm pocket-console; do printf '%-16s %s\n' "$u" "$(systemctl is-active $u.service)"; done
+    ;;
+  *) echo "usage: pocket-mode console|desktop|status" >&2; exit 1;;
+esac

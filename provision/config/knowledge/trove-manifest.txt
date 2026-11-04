@@ -1,0 +1,185 @@
+# Pocket offline content pack — v0 set for the 64 GB card (verified 2026-10-16, see docs/research/trove.md)
+# Format: <url>\t<dest relative to /data>\t<size_mb>\t<sha256 or ->\t<short name>
+# size_mb is decimal MB (10^6 bytes) from Content-Length; Hesperian lines marked "est." in the name
+# column are estimates (3 of 46 measured). Total ≈ 21,140 MB.
+# Notes for the downloader (70-knowledge.sh):
+#   - Kiwix publishes <file>.sha256 next to every ZIM; the sha256 column is copied from those sidecars.
+#   - huggingface.co /resolve/ URLs 302 to a CDN; sha256 from the HF API (lfs.oid). Follow redirects (-L).
+#   - armypubs.army.mil answers HEAD with an HTML stub; GET with a browser User-Agent works (curl -A "Mozilla/5.0").
+#   - standardebooks.org needs the ?source=download suffix, otherwise an HTML page is returned. Do not crawl SE.
+#   - gutenberg.org: rate-limit yourself (wget -w 2) per https://www.gutenberg.org/policy/robot_access.html
+#   - Not in this file (site blocks scripts; download in a browser): CDC "Make Water Safe" PDF, FCC FRS/GMRS/MURS pages,
+#     NOAA NWR Oregon station list, WHO drinking-water guidelines. See trove.md §2–§3.
+#   - Maps: CoMaps/Organic Maps regions are downloaded in-app (Flatpak). The Protomaps extract is a CLI step:
+#     pmtiles extract https://build.protomaps.com/20261015.pmtiles /data/maps/oregon.pmtiles --bbox=-124.8,41.9,-116.4,46.4
+
+# ---- Kiwix ZIMs (18,336 MB) ----
+https://download.kiwix.org/zim/wikipedia/wikipedia_en_top_maxi_2026-09.zim	kiwix/wikipedia_en_top_maxi_2026-09.zim	6991.1	7c08d2a7557ef7e3da751bb429d081e1c7c8971e50fee4fef097021a03ea6b0a	Wikipedia EN top articles, with pictures
+https://download.kiwix.org/zim/wikipedia/wikipedia_en-simple_all_nopic_2026-09.zim	kiwix/wikipedia_en-simple_all_nopic_2026-09.zim	1094.9	ee93790aa7907c41570b0861fa15c3645bbcf6da208fd2a426a62459231a66f4	Simple English Wikipedia, no pictures
+https://download.kiwix.org/zim/wikipedia/wikipedia_en_medicine_maxi_2026-10.zim	kiwix/wikipedia_en_medicine_maxi_2026-10.zim	1864.2	9a1570f2f346aa18694ee520e0483f19b7447f69e0970e2f727c53ccf0dcc7d6	WikiMed medical encyclopedia
+https://download.kiwix.org/zim/ifixit/ifixit_en_all_2025-12.zim	kiwix/ifixit_en_all_2025-12.zim	3570.7	9bb5f3408707fd0300c6ef47a425c3217187f144cd9154a928183816aa72eead	iFixit repair guides
+https://download.kiwix.org/zim/wikivoyage/wikivoyage_en_all_maxi_2026-09.zim	kiwix/wikivoyage_en_all_maxi_2026-09.zim	1071.2	ebaf235b4f95aa7f8666e0a613578577569eb6c81562ebcf397a7ba52173c848	Wikivoyage
+https://download.kiwix.org/zim/other/appropedia_en_all_maxi_2026-02.zim	kiwix/appropedia_en_all_maxi_2026-02.zim	581.6	dcf200ba723c27397e1c9a2e4891ff91fa13993df1fa285315190d8525a53469	Appropedia
+https://download.kiwix.org/zim/other/zimgit-post-disaster_en_2024-05.zim	kiwix/zimgit-post-disaster_en_2024-05.zim	644.7	0ba9bb358b768b94eb0d7920752fe356bf097de514ee61843f3a4da6cce174f8	Post Disaster Resource Library
+https://download.kiwix.org/zim/other/zimgit-medicine_en_2024-08.zim	kiwix/zimgit-medicine_en_2024-08.zim	70.2	a86c31b93e9800aae2cd812ef18cbf9c087a7537784c62fbc259db7f9f9d18c0	Medical Library (zimgit)
+https://download.kiwix.org/zim/other/zimgit-water_en_2024-08.zim	kiwix/zimgit-water_en_2024-08.zim	20.9	392c7bc970a44fddd61dd17f6eabf1f4e21936f2d5c27c83093e1dc475cb56b6	Water Treatment Library (zimgit)
+https://download.kiwix.org/zim/other/zimgit-knots_en_2024-08.zim	kiwix/zimgit-knots_en_2024-08.zim	27.9	7c3120b19fc2dc190b5ebfee01af54150136643d7b9d29d7fa9a6ba29787a57b	Library of Knots (zimgit)
+https://download.kiwix.org/zim/other/zimgit-food-preparation_en_2025-04.zim	kiwix/zimgit-food-preparation_en_2025-04.zim	97.8	db92c6c9dac14ff30f1cbc15aa834a7c012c6e87d4ff0519f33a0902ab6e732b	Food for Preppers (zimgit)
+https://download.kiwix.org/zim/other/archlinux_en_all_maxi_2026-07.zim	kiwix/archlinux_en_all_maxi_2026-07.zim	35.6	c3df551010a953d2c173af8d65a596a7ce434a7fa0771741bc800feeccad1942	ArchWiki
+https://download.kiwix.org/zim/wiktionary/wiktionary_en_simple_all_nopic_2026-04.zim	kiwix/wiktionary_en_simple_all_nopic_2026-04.zim	26.3	0b1511d1e25e018ec68c293aa3f677d668aa88e380b23c24377bd0b38de095ce	Simple English Wiktionary
+https://download.kiwix.org/zim/stack_exchange/raspberrypi.stackexchange.com_en_all_2026-08.zim	kiwix/raspberrypi.stackexchange.com_en_all_2026-08.zim	298.5	6d1beba203e725bc58eafe525d94c30a969169606c8db8328fe900ba619e5fe2	StackExchange raspberrypi
+https://download.kiwix.org/zim/stack_exchange/outdoors.stackexchange.com_en_all_2026-08.zim	kiwix/outdoors.stackexchange.com_en_all_2026-08.zim	141.4	78dccd2b5f784b17d1a22b1f65e64a74c53fa473e08f995440ff38bd8417cf1b	StackExchange outdoors
+https://download.kiwix.org/zim/stack_exchange/medicalsciences.stackexchange.com_en_all_2026-02.zim	kiwix/medicalsciences.stackexchange.com_en_all_2026-02.zim	60.8	cdf4bfa36ba2142fe3ec0d19d7c08486a0d121f55b9c44f7f5adbfb748d6cbad	StackExchange medicalsciences
+https://download.kiwix.org/zim/stack_exchange/ham.stackexchange.com_en_all_2026-08.zim	kiwix/ham.stackexchange.com_en_all_2026-08.zim	75.9	71480bd280ffaede3084fa2c9f47f87c3178f8ce8d67cdb19fb66a8025a7b93e	StackExchange ham radio
+https://download.kiwix.org/zim/stack_exchange/arduino.stackexchange.com_en_all_2026-07.zim	kiwix/arduino.stackexchange.com_en_all_2026-07.zim	259.2	772015585d544ade807395dc8527d022e12ae363478a92da92b9a79f264ae695	StackExchange arduino
+https://download.kiwix.org/zim/stack_exchange/3dprinting.stackexchange.com_en_all_2026-02.zim	kiwix/3dprinting.stackexchange.com_en_all_2026-02.zim	120.4	fdf702a5a0f1d78f74345dcdeb957dd3ec445557ae03a3df1a876d108551f4fc	StackExchange 3dprinting
+https://download.kiwix.org/zim/stack_exchange/cooking.stackexchange.com_en_all_2026-07.zim	kiwix/cooking.stackexchange.com_en_all_2026-07.zim	237.0	b0529b24e964e2552e6a1fc41ca7573ed269635802c01fb4cb082b25b7099ae1	StackExchange cooking
+https://download.kiwix.org/zim/stack_exchange/gardening.stackexchange.com_en_all_2026-08.zim	kiwix/gardening.stackexchange.com_en_all_2026-08.zim	926.8	b8a3e0db65d8a678b47accefd8565f78af0caeb454672fe0d5f365336c71c25e	StackExchange gardening
+https://download.kiwix.org/zim/stack_exchange/lifehacks.stackexchange.com_en_all_2026-08.zim	kiwix/lifehacks.stackexchange.com_en_all_2026-08.zim	48.6	c8206cbe1057af51d8ff146e1b425fba22eee4822fb91ebcf2a1ecb6fd1a055a	StackExchange lifehacks
+https://download.kiwix.org/zim/stack_exchange/sustainability.stackexchange.com_en_all_2026-08.zim	kiwix/sustainability.stackexchange.com_en_all_2026-08.zim	27.7	e9a00e1d1032bc1a5859e1a7553e6b243fcecd0c82ba372548af517119ebd75d	StackExchange sustainability
+https://download.kiwix.org/zim/devdocs/devdocs_en_python_2026-08.zim	kiwix/devdocs_en_python_2026-08.zim	4.4	289e5d3e0e8c3d3470bf183e5c913be3be0b61a730ce52a247c23812799baa51	DevDocs python
+https://download.kiwix.org/zim/devdocs/devdocs_en_bash_2026-10.zim	kiwix/devdocs_en_bash_2026-10.zim	0.6	ea4afb04ddf90f31363829ef9fa2485405dc05bd1fc62b4626245fe70c24735d	DevDocs bash
+https://download.kiwix.org/zim/devdocs/devdocs_en_c_2026-10.zim	kiwix/devdocs_en_c_2026-10.zim	1.4	5b5c00cd83c0cbfc7e89220721afbbc15ce82210d62229ac3639a169a3352431	DevDocs c
+https://download.kiwix.org/zim/devdocs/devdocs_en_cpp_2026-10.zim	kiwix/devdocs_en_cpp_2026-10.zim	8.0	ee485e3551b3b8fcd7690126ddfd8d96a63b8c85b7bd81c6cb34a89a1a0a0179	DevDocs cpp
+https://download.kiwix.org/zim/devdocs/devdocs_en_git_2026-10.zim	kiwix/devdocs_en_git_2026-10.zim	1.6	9f458df135af723d54279b0a55cffe8428b4f6453adeeef830635a01f63f5a6a	DevDocs git
+https://download.kiwix.org/zim/devdocs/devdocs_en_docker_2026-10.zim	kiwix/devdocs_en_docker_2026-10.zim	1.8	3deccfa4bdac936c1377aef585414636695f8d67bf75302c6d7af130a29ee76c	DevDocs docker
+https://download.kiwix.org/zim/devdocs/devdocs_en_sqlite_2026-10.zim	kiwix/devdocs_en_sqlite_2026-10.zim	3.5	d83fda4ba97a83a68d8c369cf1b2f3185a1d2683e5acdeca79be365df690f538	DevDocs sqlite
+https://download.kiwix.org/zim/devdocs/devdocs_en_html_2026-10.zim	kiwix/devdocs_en_html_2026-10.zim	1.7	c0e1f40b73fd9831b48cda124e167c0847a779972afc406a27cd842edc909516	DevDocs html
+https://download.kiwix.org/zim/devdocs/devdocs_en_css_2026-10.zim	kiwix/devdocs_en_css_2026-10.zim	2.7	3f286000670d80d013d0385c580ef13b9307a2065bd3be0cf7d6cf792c00bab2	DevDocs css
+https://download.kiwix.org/zim/devdocs/devdocs_en_javascript_2026-10.zim	kiwix/devdocs_en_javascript_2026-10.zim	2.6	a4a70cffdc68d2c70d40ff6bd55bf42c70d2e18c2445e5b481b22d6b9495f344	DevDocs javascript
+https://download.kiwix.org/zim/devdocs/devdocs_en_gnu-make_2026-10.zim	kiwix/devdocs_en_gnu-make_2026-10.zim	0.6	582c6e3e1e37bdcef1e5d5be2789a7214ba685179d6755631f1dee2b85138388	DevDocs gnu-make
+https://download.kiwix.org/zim/devdocs/devdocs_en_cmake_2026-08.zim	kiwix/devdocs_en_cmake_2026-08.zim	2.6	74244f1581bc8f9cbf96e03a8712c2efa839ba782057d86c995cc9e6f5421b49	DevDocs cmake
+https://download.kiwix.org/zim/devdocs/devdocs_en_rust_2026-10.zim	kiwix/devdocs_en_rust_2026-10.zim	6.2	90350f0cf55b26190b7fdc3b52f06fb263d835d4458f7c870be15a0a6a856023	DevDocs rust
+https://download.kiwix.org/zim/devdocs/devdocs_en_go_2026-10.zim	kiwix/devdocs_en_go_2026-10.zim	1.7	ce9ac3fa1b480e4707e53ecabb8b1e98764bd806cafb8d562bc15fe0e05accf8	DevDocs go
+https://download.kiwix.org/zim/devdocs/devdocs_en_node_2026-08.zim	kiwix/devdocs_en_node_2026-08.zim	1.4	3060bd03ee436920b03b54de908de368a58e34d9e96534ebd85bda7120686921	DevDocs node
+https://download.kiwix.org/zim/devdocs/devdocs_en_nginx_2026-10.zim	kiwix/devdocs_en_nginx_2026-10.zim	0.8	aad063027f766e2c97b5036170334113d390cd1cde9f69df66023f11c5c5c508	DevDocs nginx
+https://download.kiwix.org/zim/devdocs/devdocs_en_zsh_2026-10.zim	kiwix/devdocs_en_zsh_2026-10.zim	0.8	338f096c022487ea3dc07969046c7944270f97ee90d53ee10589cd22023a33c4	DevDocs zsh
+https://download.kiwix.org/zim/devdocs/devdocs_en_jq_2026-10.zim	kiwix/devdocs_en_jq_2026-10.zim	0.4	0e9f3b476e6b4409dbfc844924e15fb95b7c0f183d49166314e029d2efd7624b	DevDocs jq
+
+# ---- Local AI models (2,360 MB) — see docs/research/local-ai.md ----
+https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf	models/llm/qwen2.5-1.5b-instruct-q4_k_m.gguf	1117.3	6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e	Qwen2.5-1.5B-Instruct Q4_K_M (default chat)
+https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf	models/llm/Llama-3.2-1B-Instruct-Q4_K_M.gguf	807.7	6f85a640a97cf2bf5b8e764087b1e83da0fdb51d7c9fab7d0fece9385611df83	Llama-3.2-1B-Instruct Q4_K_M (summarizer)
+https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF/resolve/main/nomic-embed-text-v1.5.Q8_0.gguf	models/embed/nomic-embed-text-v1.5.Q8_0.gguf	146.1	3e24342164b3d94991ba9692fdc0dd08e3fd7362e0aacc396a9a5c54a544c3b7	nomic-embed-text v1.5 Q8_0 (RAG embeddings)
+https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin	models/whisper/ggml-base.en.bin	148.0	a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002	whisper.cpp base.en
+https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin	models/whisper/ggml-tiny.en.bin	77.7	921e4cf8686fdd993dcd081a5da5b6c365bfde1162e72b08d75ac75289920b1f	whisper.cpp tiny.en
+https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx	models/piper/en_US-lessac-medium.onnx	63.2	5efe09e69902187827af646e1a6e9d269dee769f9877d17b16b1b46eeaaf019f	Piper voice en_US-lessac-medium
+https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json	models/piper/en_US-lessac-medium.onnx.json	0.005	-	Piper voice config
+
+# ---- Medical / survival / preparedness PDFs (~142 MB) ----
+https://armypubs.army.mil/epubs/DR_pubs/DR_a/ARN46159-ATP_4-02.11-000-WEB-1.pdf	docs/medical/ATP_4-02.11_First_Aid_TCCC_2026.pdf	12.7	-	ATP 4-02.11 Casualty Response, TCCC and First Aid (2026)
+https://armypubs.army.mil/epubs/DR_pubs/DR_a/pdf/web/ARN12086_ATP%203-50x21%20FINAL%20WEB%202.pdf	docs/survival/ATP_3-50.21_Survival_2018.pdf	23.8	-	ATP 3-50.21 Survival (2018)
+https://www.ready.gov/sites/default/files/2021-11/are-you-ready-guide.pdf	docs/prep/FEMA_Are_You_Ready.pdf	4.2	-	FEMA Are You Ready?
+https://www.ready.gov/sites/default/files/2021-02/ready_checklist.pdf	docs/prep/Ready_Emergency_Supply_Checklist.pdf	0.2	-	Ready.gov supply checklist
+https://www.oregon.gov/oem/Documents/B2WR-Complete-Tool-Kit-EN.pdf	docs/prep/Oregon_Be_2_Weeks_Ready_Toolkit.pdf	40.4	-	Oregon OEM Be 2 Weeks Ready toolkit
+https://www.oregon.gov/oem/Documents/OEM_Pocket-Planner-ENGLISH_2023.pdf	docs/prep/Oregon_OEM_Pocket_Planner_2023.pdf	0.3	-	Oregon OEM pocket planner
+https://www.redcross.org/content/dam/redcross/training-services/no-index/wilderness-remote-first-aid-erg.pdf	docs/medical/RedCross_Wilderness_Remote_First_Aid_ERG.pdf	5.2	-	Red Cross Wilderness & Remote First Aid ERG
+https://nchfp.uga.edu/papers/guide/GUIDE01_HomeCan_rev0715.pdf	docs/food/USDA_Canning_Guide_1_Principles.pdf	3.8	-	USDA canning guide 1
+https://nchfp.uga.edu/papers/guide/GUIDE02_HomeCan_rev0715.pdf	docs/food/USDA_Canning_Guide_2_Fruit.pdf	1.1	-	USDA canning guide 2
+https://nchfp.uga.edu/papers/guide/GUIDE03_HomeCan_rev0715.pdf	docs/food/USDA_Canning_Guide_3_Tomatoes.pdf	1.0	-	USDA canning guide 3
+https://nchfp.uga.edu/papers/guide/GUIDE04_HomeCan_rev0715.pdf	docs/food/USDA_Canning_Guide_4_Vegetables.pdf	2.0	-	USDA canning guide 4
+https://nchfp.uga.edu/papers/guide/GUIDE05_HomeCan_rev0715.pdf	docs/food/USDA_Canning_Guide_5_Meat_Seafood.pdf	1.4	-	USDA canning guide 5
+https://nchfp.uga.edu/papers/guide/GUIDE06_HomeCan_rev0715.pdf	docs/food/USDA_Canning_Guide_6_Fermented_Pickled.pdf	3.2	-	USDA canning guide 6
+https://nchfp.uga.edu/papers/guide/GUIDE07_HomeCan_rev0715.pdf	docs/food/USDA_Canning_Guide_7_Jams_Jellies.pdf	1.3	-	USDA canning guide 7
+# Hesperian: free section PDFs offered by the publisher; keep on-device only (no redistribution). 3 sizes measured, rest est. 0.5
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_fm.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_fm.pdf	0.4	-	WTND front matter
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_toc.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_toc.pdf	0.5	-	WTND contents/intro (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_int.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_int.pdf	0.5	-	WTND words to the health worker (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_01.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_01.pdf	0.5	-	WTND ch 1
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_02.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_02.pdf	0.5	-	WTND ch 2 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_03.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_03.pdf	0.5	-	WTND ch 3 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_04.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_04.pdf	0.5	-	WTND ch 4 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_05.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_05.pdf	0.5	-	WTND ch 5 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_06.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_06.pdf	0.5	-	WTND ch 6 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_07.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_07.pdf	0.5	-	WTND ch 7 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_08.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_08.pdf	0.5	-	WTND ch 8 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_09.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_09.pdf	0.5	-	WTND ch 9 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_10.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_10.pdf	0.5	-	WTND ch 10 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_11.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_11.pdf	0.5	-	WTND ch 11 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_12.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_12.pdf	0.5	-	WTND ch 12 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_13.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_13.pdf	0.5	-	WTND ch 13 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_14.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_14.pdf	0.5	-	WTND ch 14 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_15.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_15.pdf	0.5	-	WTND ch 15 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_16.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_16.pdf	0.5	-	WTND ch 16 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_17.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_17.pdf	0.5	-	WTND ch 17 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_18.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_18.pdf	0.5	-	WTND ch 18 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_19.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_19.pdf	0.5	-	WTND ch 19 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_20.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_20.pdf	0.5	-	WTND ch 20 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_21.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_21.pdf	0.5	-	WTND ch 21 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_22.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_22.pdf	0.5	-	WTND ch 22 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_23.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_23.pdf	0.5	-	WTND ch 23 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_gp.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_gp.pdf	0.5	-	WTND green pages (medicines)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_info.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_info.pdf	0.5	-	WTND additional information (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_gloss.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_gloss.pdf	0.5	-	WTND vocabulary (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_resc.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_resc.pdf	0.5	-	WTND resources (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_indx.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_indx.pdf	0.5	-	WTND index (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_wtnd_2025/en_wtnd_2025_bm.pdf	docs/medical/hesperian/wtnd/en_wtnd_2025_bm.pdf	0.5	-	WTND dosage blanks (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_fm.pdf	docs/medical/hesperian/dentist/en_dent_2024_fm.pdf	0.3	-	WTN Dentist front matter (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_01.pdf	docs/medical/hesperian/dentist/en_dent_2024_01.pdf	0.2	-	WTN Dentist ch 1
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_02.pdf	docs/medical/hesperian/dentist/en_dent_2024_02.pdf	0.3	-	WTN Dentist ch 2 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_03.pdf	docs/medical/hesperian/dentist/en_dent_2024_03.pdf	0.3	-	WTN Dentist ch 3 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_04.pdf	docs/medical/hesperian/dentist/en_dent_2024_04.pdf	0.3	-	WTN Dentist ch 4 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_05.pdf	docs/medical/hesperian/dentist/en_dent_2024_05.pdf	0.3	-	WTN Dentist ch 5 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_06.pdf	docs/medical/hesperian/dentist/en_dent_2024_06.pdf	0.3	-	WTN Dentist ch 6 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_07.pdf	docs/medical/hesperian/dentist/en_dent_2024_07.pdf	0.3	-	WTN Dentist ch 7 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_08.pdf	docs/medical/hesperian/dentist/en_dent_2024_08.pdf	0.3	-	WTN Dentist ch 8 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_09.pdf	docs/medical/hesperian/dentist/en_dent_2024_09.pdf	0.3	-	WTN Dentist ch 9 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_10.pdf	docs/medical/hesperian/dentist/en_dent_2024_10.pdf	0.3	-	WTN Dentist ch 10 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_11.pdf	docs/medical/hesperian/dentist/en_dent_2024_11.pdf	0.3	-	WTN Dentist ch 11 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_12.pdf	docs/medical/hesperian/dentist/en_dent_2024_12.pdf	0.3	-	WTN Dentist ch 12 (est.)
+https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_bm.pdf	docs/medical/hesperian/dentist/en_dent_2024_bm.pdf	0.3	-	WTN Dentist appendices (est.)
+
+# ---- Radio references ----
+https://www.arrl.org/files/file/Regulatory/Band%20Chart/Hambands4_Color_11x8_5.pdf	docs/radio/ARRL_US_Amateur_Bands_Color_Letter.pdf	1.1	-	ARRL band chart, color letter
+https://www.arrl.org/files/file/Regulatory/Band%20Chart/Hambands4_Color_17x11.pdf	docs/radio/ARRL_US_Amateur_Bands_Color_11x17.pdf	0.6	-	ARRL band chart, color 11x17
+https://www.govinfo.gov/content/pkg/CFR-2025-title47-vol5/pdf/CFR-2025-title47-vol5-part97.pdf	docs/radio/47CFR97_Amateur_Radio_2025.pdf	0.4	-	47 CFR Part 97 (2025)
+https://www.govinfo.gov/content/pkg/CFR-2025-title47-vol5/pdf/CFR-2025-title47-vol5-part95.pdf	docs/radio/47CFR95_Personal_Radio_FRS_GMRS_MURS_2025.pdf	0.5	-	47 CFR Part 95 (2025)
+
+# ---- Software references ----
+https://www.debian.org/doc/manuals/debian-reference/debian-reference.en.pdf	docs/linux/debian-reference.en.pdf	1.4	-	Debian Reference
+http://debian-handbook.info/download/stable/debian-handbook.epub	docs/linux/debian-handbook.epub	5.9	-	Debian Administrator's Handbook (EPUB)
+https://docs.python.org/3.13/archives/python-3.13-docs-html.tar.bz2	docs/linux/python-3.13-docs-html.tar.bz2	8.1	-	Python 3.13 HTML docs
+https://github.com/tldr-pages/tldr/releases/latest/download/tldr-pages.en.zip	docs/linux/tldr-pages.en.zip	3.4	-	tldr pages (English)
+
+# ---- Ebooks: Standard Ebooks (public domain, SE work CC0) ----
+https://standardebooks.org/ebooks/jane-austen/pride-and-prejudice/downloads/jane-austen_pride-and-prejudice.epub?source=download	books/jane-austen_pride-and-prejudice.epub	0.8	-	Pride and Prejudice
+https://standardebooks.org/ebooks/mary-shelley/frankenstein/downloads/mary-shelley_frankenstein.epub?source=download	books/mary-shelley_frankenstein.epub	0.7	-	Frankenstein
+https://standardebooks.org/ebooks/bram-stoker/dracula/downloads/bram-stoker_dracula.epub?source=download	books/bram-stoker_dracula.epub	0.6	-	Dracula
+https://standardebooks.org/ebooks/herman-melville/moby-dick/downloads/herman-melville_moby-dick.epub?source=download	books/herman-melville_moby-dick.epub	1.2	-	Moby-Dick
+https://standardebooks.org/ebooks/charles-dickens/a-tale-of-two-cities/downloads/charles-dickens_a-tale-of-two-cities.epub?source=download	books/charles-dickens_a-tale-of-two-cities.epub	0.8	-	A Tale of Two Cities
+https://standardebooks.org/ebooks/charles-dickens/great-expectations/downloads/charles-dickens_great-expectations.epub?source=download	books/charles-dickens_great-expectations.epub	1.0	-	Great Expectations
+https://standardebooks.org/ebooks/mark-twain/the-adventures-of-huckleberry-finn/downloads/mark-twain_the-adventures-of-huckleberry-finn.epub?source=download	books/mark-twain_the-adventures-of-huckleberry-finn.epub	0.8	-	Huckleberry Finn
+https://standardebooks.org/ebooks/mark-twain/the-adventures-of-tom-sawyer/downloads/mark-twain_the-adventures-of-tom-sawyer.epub?source=download	books/mark-twain_the-adventures-of-tom-sawyer.epub	0.7	-	Tom Sawyer
+https://standardebooks.org/ebooks/arthur-conan-doyle/the-adventures-of-sherlock-holmes/downloads/arthur-conan-doyle_the-adventures-of-sherlock-holmes.epub?source=download	books/arthur-conan-doyle_the-adventures-of-sherlock-holmes.epub	0.7	-	Adventures of Sherlock Holmes
+https://standardebooks.org/ebooks/h-g-wells/the-war-of-the-worlds/downloads/h-g-wells_the-war-of-the-worlds.epub?source=download	books/h-g-wells_the-war-of-the-worlds.epub	0.8	-	The War of the Worlds
+https://standardebooks.org/ebooks/h-g-wells/the-time-machine/downloads/h-g-wells_the-time-machine.epub?source=download	books/h-g-wells_the-time-machine.epub	0.5	-	The Time Machine
+https://standardebooks.org/ebooks/oscar-wilde/the-picture-of-dorian-gray/downloads/oscar-wilde_the-picture-of-dorian-gray.epub?source=download	books/oscar-wilde_the-picture-of-dorian-gray.epub	0.6	-	The Picture of Dorian Gray
+https://standardebooks.org/ebooks/jack-london/the-call-of-the-wild/downloads/jack-london_the-call-of-the-wild.epub?source=download	books/jack-london_the-call-of-the-wild.epub	0.5	-	The Call of the Wild
+https://standardebooks.org/ebooks/robert-louis-stevenson/treasure-island/downloads/robert-louis-stevenson_treasure-island.epub?source=download	books/robert-louis-stevenson_treasure-island.epub	0.7	-	Treasure Island
+https://standardebooks.org/ebooks/lewis-carroll/alices-adventures-in-wonderland/john-tenniel/downloads/lewis-carroll_alices-adventures-in-wonderland_john-tenniel.epub?source=download	books/lewis-carroll_alices-adventures-in-wonderland.epub	18.4	-	Alice in Wonderland (illustrated)
+https://standardebooks.org/ebooks/charlotte-bronte/jane-eyre/downloads/charlotte-bronte_jane-eyre.epub?source=download	books/charlotte-bronte_jane-eyre.epub	0.9	-	Jane Eyre
+https://standardebooks.org/ebooks/emily-bronte/wuthering-heights/downloads/emily-bronte_wuthering-heights.epub?source=download	books/emily-bronte_wuthering-heights.epub	0.8	-	Wuthering Heights
+https://standardebooks.org/ebooks/alexandre-dumas/the-count-of-monte-cristo/chapman-and-hall/downloads/alexandre-dumas_the-count-of-monte-cristo_chapman-and-hall.epub?source=download	books/alexandre-dumas_the-count-of-monte-cristo.epub	1.7	-	The Count of Monte Cristo
+https://standardebooks.org/ebooks/sun-tzu/the-art-of-war/lionel-giles/downloads/sun-tzu_the-art-of-war_lionel-giles.epub?source=download	books/sun-tzu_the-art-of-war.epub	0.6	-	The Art of War
+https://standardebooks.org/ebooks/marcus-aurelius/meditations/george-long/downloads/marcus-aurelius_meditations_george-long.epub?source=download	books/marcus-aurelius_meditations.epub	0.7	-	Meditations
+https://standardebooks.org/ebooks/henry-david-thoreau/walden/downloads/henry-david-thoreau_walden.epub?source=download	books/henry-david-thoreau_walden.epub	1.0	-	Walden
+https://standardebooks.org/ebooks/homer/the-odyssey/william-cullen-bryant/downloads/homer_the-odyssey_william-cullen-bryant.epub?source=download	books/homer_the-odyssey.epub	1.0	-	The Odyssey
+https://standardebooks.org/ebooks/f-scott-fitzgerald/the-great-gatsby/downloads/f-scott-fitzgerald_the-great-gatsby.epub?source=download	books/f-scott-fitzgerald_the-great-gatsby.epub	0.4	-	The Great Gatsby
+https://standardebooks.org/ebooks/louisa-may-alcott/little-women/downloads/louisa-may-alcott_little-women.epub?source=download	books/louisa-may-alcott_little-women.epub	1.0	-	Little Women
+https://standardebooks.org/ebooks/edgar-allan-poe/short-fiction/downloads/edgar-allan-poe_short-fiction.epub?source=download	books/edgar-allan-poe_short-fiction.epub	1.3	-	Poe short fiction
+https://standardebooks.org/ebooks/jerome-k-jerome/three-men-in-a-boat/downloads/jerome-k-jerome_three-men-in-a-boat.epub?source=download	books/jerome-k-jerome_three-men-in-a-boat.epub	0.7	-	Three Men in a Boat
+https://standardebooks.org/ebooks/daniel-defoe/the-life-and-adventures-of-robinson-crusoe/downloads/daniel-defoe_the-life-and-adventures-of-robinson-crusoe.epub?source=download	books/daniel-defoe_robinson-crusoe.epub	0.7	-	Robinson Crusoe
+https://standardebooks.org/ebooks/kenneth-grahame/the-wind-in-the-willows/downloads/kenneth-grahame_the-wind-in-the-willows.epub?source=download	books/kenneth-grahame_the-wind-in-the-willows.epub	0.8	-	The Wind in the Willows
+# ---- Ebooks: Project Gutenberg extras (public domain) ----
+https://www.gutenberg.org/ebooks/2600.epub3.images	books/pg2600_war-and-peace.epub	1.8	-	War and Peace
+https://www.gutenberg.org/ebooks/2554.epub3.images	books/pg2554_crime-and-punishment.epub	0.8	-	Crime and Punishment
+https://www.gutenberg.org/ebooks/28054.epub3.images	books/pg28054_brothers-karamazov.epub	1.2	-	The Brothers Karamazov
+https://www.gutenberg.org/ebooks/1232.epub3.images	books/pg1232_the-prince.epub	0.4	-	The Prince
+https://www.gutenberg.org/ebooks/16.epub3.images	books/pg16_peter-pan.epub	0.4	-	Peter Pan
+https://www.gutenberg.org/ebooks/43.epub3.images	books/pg43_jekyll-and-hyde.epub	0.3	-	Dr Jekyll and Mr Hyde
+https://www.gutenberg.org/ebooks/1952.epub3.images	books/pg1952_the-yellow-wallpaper.epub	0.2	-	The Yellow Wallpaper
+https://www.gutenberg.org/ebooks/244.epub3.images	books/pg244_a-study-in-scarlet.epub	0.4	-	A Study in Scarlet
+
+# ---- Maps ----
+https://download.geofabrik.de/north-america/us/oregon-latest.osm.pbf	maps/oregon-latest.osm.pbf	254.5	-	OSM Oregon extract (Geofabrik, ODbL)
+# optional neighbors: washington-latest.osm.pbf 364.7 MB, idaho-latest.osm.pbf 129.6 MB (same folder)
+# CoMaps / Organic Maps regions: in-app download (Flatpak app.comaps.comaps / app.organicmaps.desktop), ≈ 1,000 MB est.

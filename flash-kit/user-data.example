@@ -1,0 +1,31 @@
+#cloud-config
+# Template for the first-boot "user-data" file (cloud-init). Copy it to "user-data" in this folder and
+# replace every CHANGE_ME value. The real file is ignored by git because it holds your keys.
+#
+# This shows the shape of the file. It has not been run as written: the kit used on the original device
+# embedded this repository as a tarball and ran provision stage 10 from runcmd; this template clones it
+# instead. Adjust it to your setup before relying on it.
+
+hostname: pocket
+manage_etc_hosts: true
+enable_ssh: true
+ssh_pwauth: false
+
+users:
+  - name: CHANGE_ME_USER
+    groups: [sudo, video, input]
+    shell: /bin/bash
+    lock_passwd: false
+    # Generate with:  openssl passwd -6
+    passwd: CHANGE_ME_PASSWORD_HASH
+    ssh_authorized_keys:
+      - CHANGE_ME_YOUR_SSH_PUBLIC_KEY
+
+packages:
+  - git
+
+runcmd:
+  - [ git, clone, "CHANGE_ME_URL_OF_THIS_REPOSITORY", /home/CHANGE_ME_USER/pocket ]
+  - [ chown, -R, "CHANGE_ME_USER:CHANGE_ME_USER", /home/CHANGE_ME_USER/pocket ]
+  # Stage 10 writes its output to the log; the last line says how it ended ("stage 10 exit 0" on success).
+  - [ bash, -c, "cd /home/CHANGE_ME_USER/pocket/provision && POCKET_USER=CHANGE_ME_USER ./run.sh 10 > /var/log/pocket-firstboot.log 2>&1; echo \"stage 10 exit $?\" >> /var/log/pocket-firstboot.log" ]

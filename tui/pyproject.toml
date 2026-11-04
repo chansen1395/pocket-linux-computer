@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pocket-tui"
+version = "0.1.0"
+description = "Pocket TUI: the console-mode text UI (Textual) for a Raspberry Pi 5 pocket computer"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Connor Hansen" }]
+requires-python = ">=3.11"
+dependencies = ["textual>=8.2"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24"]
+
+[project.scripts]
+pocket-tui = "pocket_tui.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["pocket_tui*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+pocket_tui = ["*.tcss"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]

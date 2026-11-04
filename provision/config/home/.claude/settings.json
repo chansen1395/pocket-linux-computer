@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(dd:*)",
+      "Bash(sudo dd:*)",
+      "Bash(mkfs:*)",
+      "Bash(sudo mkfs:*)",
+      "Bash(wipefs:*)",
+      "Bash(sudo wipefs:*)",
+      "Bash(sgdisk:*)",
+      "Bash(sudo sgdisk:*)",
+      "Bash(sudo rpi-update:*)",
+      "Bash(sudo rpi-eeprom-config --apply:*)",
+      "Bash(sudo rm -rf /)",
+      "Bash(sudo rm -rf /*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "/usr/local/bin/pocket-snapshot", "timeout": 30 }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "/usr/local/bin/pocket-audit", "timeout": 5 }]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Claude Code PreToolUse hook (Bash). Reads the tool call as JSON on stdin; if the command looks
+# like it changes the system and root is btrfs, takes a read-only snapshot first. Never blocks.
+# Keeps the newest 20 "claude-" snapshots. Needs: jq, and pocket-helper with its sudoers rule (installed by stage 50).
+set -u
+input="$(cat)"
+cmd="$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)"
+[ -n "$cmd" ] || exit 0
+
+risky='(^|[;&| ])(sudo|apt(-get)?|dpkg|systemctl (enable|disable|mask|unmask)|nft|rpi-eeprom|raspi-config|update-initramfs|tee /(etc|boot)|>+ */(etc|boot)/)'
+printf '%s' "$cmd" | grep -Eq "$risky" || exit 0
+[ "$(findmnt -no FSTYPE / 2>/dev/null)" = "btrfs" ] || exit 0
+[ -d /.snapshots ] || exit 0
+
+# Both calls go through pocket-helper, which only accepts snapshot names of exactly this shape.
+HELPER=/usr/local/bin/pocket-helper
+name="$(date +%Y%m%d-%H%M%S)-claude"
+if sudo -n "$HELPER" snapshot "$name" >/dev/null 2>&1; then
+  printf 'pocket: snapshot /.snapshots/%s taken before: %s\n' "$name" "${cmd:0:80}"
+  # prune
+  ls -1d /.snapshots/*-claude 2>/dev/null | sort | head -n -20 | while read -r old; do
+    sudo -n "$HELPER" snapshot-delete "$(basename "$old")" >/dev/null 2>&1 || true
+  done
+else
+  printf 'pocket: snapshot skipped (is pocket-helper installed and root on btrfs?)\n' >&2
+fi
+exit 0
