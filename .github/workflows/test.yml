@@ -1,0 +1,35 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: python -m pip install -e "core[dev]" -e "tui[dev]"
+      - name: Core tests
+        run: python -m pytest core/tests -q
+      - name: Text UI tests
+        run: python -m pytest tui/tests -q
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        working-directory: provision
+        run: |
+          shellcheck -x -S warning run.sh lib.sh stages/*.sh test/container-test.sh \
+            config/usr/local/bin/pocket-audit config/usr/local/bin/pocket-backup \
+            config/usr/local/bin/pocket-mode config/usr/local/bin/pocket-snapshot \
+            config/home/.local/bin/llama-chat
